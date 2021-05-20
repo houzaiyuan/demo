@@ -1,0 +1,430 @@
+#### 多翼创新java开发（Android）笔试题目
+
+
+
+一、有一个物体从200米的高度自由落下，每次落地后反弹回原来高度的3/4，再落下，当高度小于1米时在落地不再弹起，问：完全落地所走过的路程？在第7次落地时已经反弹的路程？
+
+```
+完全落地所走过的总路程为:1394.9260608977056米。在第7次落地反弹的路程为：1150.830078125米。
+```
+
+代码实现：
+
+```java
+package test2;
+
+/**
+ * 有一个物体从200米的高度自由落下，每次落地后反弹回原来高度的3/4，再落下，
+ * 当高度小于1米时在落地不再弹起，问：完全落地所走过的路程？在第7次落地时已经反弹的路程？
+ **/
+public class Demo1 {
+
+    public static void main(String[] args) {
+        method(200d, 1, 0d);
+    }
+
+    /**
+     * @param h 落地的高度
+     * @param n 落地的次数
+     * @param d 前n-1 次落地的路程总和
+     */
+    public static void method(double h, int n, double d) {
+        if (h <= 1) {
+            System.out.println("总路程为：" + d);
+            return;
+        }
+        //第一次落地只计算一次
+        if (n == 1) {
+            d += h;
+        }
+        System.out.println("第" + n + "次落地高度为" + h + ", 总路程为" + d);
+        n++;
+        h = h * 0.75;
+        d += h * 2;  //非第一次落地需要计算两次高度
+        method(h, n, d);
+    }
+
+}
+
+```
+
+测试结果:
+
+```
+第1次落地高度为200.0, 总路程为200.0
+第2次落地高度为150.0, 总路程为500.0
+第3次落地高度为112.5, 总路程为725.0
+第4次落地高度为84.375, 总路程为893.75
+第5次落地高度为63.28125, 总路程为1020.3125
+第6次落地高度为47.4609375, 总路程为1115.234375
+第7次落地高度为35.595703125, 总路程为1186.42578125
+第8次落地高度为26.69677734375, 总路程为1239.8193359375
+第9次落地高度为20.0225830078125, 总路程为1279.864501953125
+第10次落地高度为15.016937255859375, 总路程为1309.8983764648438
+第11次落地高度为11.262702941894531, 总路程为1332.4237823486328
+第12次落地高度为8.447027206420898, 总路程为1349.3178367614746
+第13次落地高度为6.335270404815674, 总路程为1361.988377571106
+第14次落地高度为4.751452803611755, 总路程为1371.4912831783295
+第15次落地高度为3.5635896027088165, 总路程为1378.618462383747
+第16次落地高度为2.6726922020316124, 总路程为1383.9638467878103
+第17次落地高度为2.0045191515237093, 总路程为1387.9728850908577
+第18次落地高度为1.503389363642782, 总路程为1390.9796638181433
+第19次落地高度为1.1275420227320865, 总路程为1393.2347478636075
+总路程为：1394.9260608977056
+
+Process finished with exit code 0
+```
+
+
+
+二、一个有n级的台阶，一次可以走1级、2级或3级，问走完n级台阶有多少种走法。
+
+```
+解题思路：
+（1）n阶一次只能走一级 走完n阶台阶只有1种走法
+（2）n阶台阶可以走一级，二级
+	n= 1时：   （1）                                                               1种走法
+	n= 2时：  （1+1）（2）                                                          2种走法
+	n= 3时：   (1+1+1) (1+2) (2+1)                                                 3种走法
+	n= 4时：  (1+1+1+1)(1+1+2)(1+2+1)(2+1+1)(2+2)			                         5种走法
+	n= 5时：  (1+1+1+1+1)(1+1+1+2)(1+1+2+1)(1+2+1+1)(2+1+1+1)(2+2+1)(2+1+2)(1+2+2) 8种走法
+	...
+	从这里可以看出要想走到第n阶台阶 ，必须要达到第n-1阶台阶或第n-2阶台阶，那么第n阶台阶的走法就等于第n-1阶台阶和第n-2阶台阶走法之和,即
+	f(n) = f(n-1)+f(n-2)        其中f(1)=1，f(2)=2,n>=3
+	这个为斐波那契数列问题，代码实现可以用递归或是动态规划实现。
+（3）n阶台阶可以走一级，二级，三级
+	n= 1时：   （1）                                                               1种走法
+	n= 2时：  （1+1）（2）                                                          2种走法
+	n= 3时：  （1+1+1）（1+2）（2+1）（3）										   4种走法
+	n= 4时：	（1+1+1+1）（1+3）（3+1）（1+1+2）（1+2+1） （2+1+1）（2+2）           	7种走法
+    n= 5时： （1+1+1+1+1） （1+1+1+2）（1+1+2+1）（1+2+1+1）(2+1+1+1) (1+1+3)(1+3+1)(3+1+1)
+    			(2+2+1)(1+2+2)(2+1+2)(2+3)(3+2)									13种走法
+   ...
+   要想走到第n阶台阶，必须要到达第n-1阶台阶，或第n-2阶台阶，或是第n-3阶台阶，那么第n阶台阶的走法就等于第n-1阶台阶和第n-2阶台阶以及第n-3阶台阶走法之和，即
+   f(n) = f(n-1)+f(n-2)+f(n-3)   其中f(1)=1，f(2)=2,f(3)=4, n>=4
+   代码实现可以用递归或是动态规划实现。
+    			
+
+```
+
+
+
+三、分别用递归与非递归方式代码实现附件给定的二叉搜索树的第m大的节点；
+
+```
+递归方式：采用二叉树的前序遍历得到二叉树的数据集合，对数据集合降序排序，根据下标m-1即可获得二叉树的第m大的节点
+非递归方式：采用二叉树的层序遍历实现，思路同上一致
+```
+
+代码实现：
+
+```java
+package test2;
+
+import java.util.*;
+
+/**
+ * @author houzaiyuan
+ * @date 2021/05/19
+ **/
+public class BinaryTree {
+
+    public static void main(String[] args) {
+        BinaryTree tree = new BinaryTree(11);    // 11
+        Node node = tree.addNode(tree.root, 8, true);  // 8
+        Node node1 = tree.addNode(node, 16, true);  //16
+        tree.addNode(node1, 10, true);   //10
+        Node node2 = tree.addNode(node, 15, false);  // 15
+        tree.addNode(node2, 20 ,true);    //20
+        Node node3 = tree.addNode(node2, 4, false);  //4
+        tree.addNode(node3, 3, true);   // 3
+        tree.addNode(node3, 17, false);  //17
+        Node node4 = tree.addNode(tree.root, 9, false);  //9
+        tree.addNode(node4, 2, true);  //2
+        Node node5 = tree.addNode(node4, 7, false);//7
+        tree.addNode(node5, 5 ,true);   //5
+
+//        List<Integer> datas = tree.preOrder();
+//        for (Integer data : datas) {
+//            System.out.println(data);
+//        }
+
+//        List<Integer> datas = tree.level();
+//        for (Integer data : datas) {
+//            System.out.println(data);
+//        }
+        Integer data = tree.getData(tree.level(), 3);
+        System.out.println(data);
+
+    }
+
+    public static class Node{
+        private Node lNode;
+        private Node rNode;
+        private Integer data;
+
+        public Node(Integer data){
+            this.data = data;
+        }
+
+        public Node(Node lNode, Node rNode, Integer data){
+            this.lNode = lNode;
+            this.rNode = rNode;
+            this.data = data;
+        }
+    }
+
+    private Node root; //根节点
+
+    public BinaryTree(Integer data) {
+        this.root=new Node(data);
+    }
+    //添加节点
+    public Node addNode(Node parentNode, Integer data, boolean isLeft){
+        if (parentNode == null){
+            throw new RuntimeException("父节点为空，无法添加子节点");
+        }
+        if (isLeft && parentNode.lNode != null){
+            throw new RuntimeException("左子节点已存在，添加失败");
+        }
+        if (!isLeft && parentNode.rNode != null){
+            throw new RuntimeException("右子节点已存在，添加失败");
+        }
+
+        Node newNode = new Node(data);
+        if (isLeft){
+            parentNode.lNode = newNode;
+        }else {
+            parentNode.rNode = newNode;
+        }
+        return newNode;
+    }
+
+
+
+    // 前序遍历
+    public List<Integer> preOrder(){
+        return preOrderTraverse(root);
+    }
+    public List<Integer> preOrderTraverse(Node node){
+        List<Integer> list = new ArrayList<>();
+        list.add(node.data);
+        if (node.lNode != null){
+            list.addAll(preOrderTraverse(node.lNode));
+        }
+        if (node.rNode != null){
+            list.addAll(preOrderTraverse(node.rNode));
+        }
+        return list;
+    }
+
+    //层序遍历
+    public List<Integer> level(){
+        return levelTraverse(root);
+    }
+    public List<Integer> levelTraverse(Node node){
+        List<Integer> list = new ArrayList<>();
+        if (node == null){
+            return list;
+        }
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(root); // 根节点入队列
+        while (!queue.isEmpty()){
+            Node nowNode = queue.poll();
+            list.add(nowNode.data);
+            if (nowNode.lNode != null){
+                queue.add(nowNode.lNode); // 左子节点入栈
+            }
+            if (nowNode.rNode != null){
+                queue.add(nowNode.rNode);
+            }
+        }
+        return list;
+    }
+
+    /**
+     *
+     * @param list  二叉树的节点的数据值集合（无序）
+     * @param m   
+     */
+    public Integer getData(List<Integer> list , int m){
+        if (list == null || list.isEmpty() || m > list.size()){
+            return null;
+        }
+        //对集合进行排序
+        Collections.sort(list,(o1, o2) -> {
+            return o2 - o1;
+        });
+        return list.get(m -1);
+    }
+}
+
+```
+
+
+
+四、学习Android的 ListView或Recyclerview，实现列表展示数据（可滚动，每项列表有TextView、Button，长按实时删除当前项）；
+
+```
+开发工具：Intellij idea 
+```
+
+activity_main.xml文件：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+
+    <ListView
+            android:id="@+id/contacts_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+    </ListView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+listview_item.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <TextView android:id="@+id/name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:padding="15dp"
+                  android:textSize="20sp"
+                  android:textColor="#000000"/>
+
+    <TextView android:id="@+id/price"
+              android:layout_weight="1"
+              android:layout_height="0dp"
+              android:layout_width="wrap_content"
+              android:gravity="end"
+              android:padding="15dp"
+              android:textSize="20sp"
+              android:textColor="#000000"/>
+    </LinearLayout>
+
+<!--    <Button-->
+
+<!--            android:id="@+id/button"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="长按删除"/>-->
+
+
+</LinearLayout>
+
+```
+
+MainActivity.java
+
+```java
+package com.example.myapplication;
+
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class MainActivity extends AppCompatActivity {
+
+    //    private String data[] = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"};
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//        ListView listView = (ListView) findViewById(R.id.listview);//在视图中找到ListView
+//
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,data);//新建并配置ArrayAapeter
+//        listView.setAdapter(adapter);
+//
+//    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        final List<Map<String, Object>> data = new ArrayList<>();
+        String[] booksName = new String[]{"C++", "Java", "Python", "C#", "C", ".net", "go", "Object-c","sql", "jsp"};
+        String[] bookPrice = new String[]{"99.99元", "100.00元", "88.50元", "100.00元","99.99元", "100.00元", "88.50元", "100.00元","88.50元", "100.00元"};
+        for (int i = 0; i < booksName.length; i++) {
+            Map<String, Object> temp = new LinkedHashMap<>();
+            temp.put("name", booksName[i]);
+            temp.put("price", bookPrice[i]);
+            data.add(temp);
+        }
+
+        //获得button对象
+      //  Button btn = (Button) findViewById(R.id.button);
+        //创建SimpleAdapter
+        final ListView listView = (ListView) findViewById(R.id.contacts_list);
+        final SimpleAdapter simpleAdapter = new SimpleAdapter(this, data, R.layout.listview_item, new String[]{"name", "price"}, new int[]{R.id.name, R.id.price});
+        listView.setAdapter(simpleAdapter);
+
+       // listView 长按事件
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                data.remove(position);  //删除该元素
+                simpleAdapter.notifyDataSetChanged(); //更新列表数据
+                Toast.makeText(MainActivity.this, "删除成功！", Toast.LENGTH_SHORT)
+                        .show();
+                return false;
+            }
+        });
+
+//        //button长按删除事件
+//        btn.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                data.remove(v);  //删除该元素
+//                simpleAdapter.notifyDataSetChanged(); //更新列表数据
+//                Toast.makeText(MainActivity.this, "删除成功！", Toast.LENGTH_SHORT)
+//                        .show();
+//                return false;
+//            }
+//        });
+    }
+
+}
+
+
+```
+
+问题：
+
+```
+这个列表中可以给每一项显示一个button，但是显示button后，给button添加长按事件会有一个view对象，我不明白怎么通过view对象去获得我数据集的对应下标，如果不是给button添加事件，而是给listview添加setOnItemLongClickListener事件监听，就可以通过position变量获得下标，调用remove方法将对应下标的元素删除，再通过notifyDataSetChanged去更新列表数据。
+
+```
+
+
+
+
+
+
+
+
+
